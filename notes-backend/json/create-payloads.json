@@ -1,0 +1,12 @@
+{
+    "notesCreate": {
+        "lambda": {
+            "requestContext": {
+                "identity": {
+                    "cognitoIdentityId": "user1"
+                }
+            },
+            "body": "{\"content\": \"bla bla note\"}"
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "notesGet": {
+        "lambda": {
+            "requestContext": {
+                "identity": {
+                    "cognitoIdentityId": "USER-SUB-1234"
+                }
+            },
+            "pathParameters": {
+                "id": "3c1dd6b0-0b92-11e9-a9b5-671e5020c187"
+            }
+        }
+    }
+}

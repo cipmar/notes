@@ -1,0 +1,404 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Notes App
+Resources:
+  ##############################################################################
+  # Functions
+  ##############################################################################
+  
+  # Notes Create Function
+  notesCreateRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "notesCreatePolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "dynamodb:PutItem"
+                Resource: "*"
+  notesCreateFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: js/create.handler
+      Runtime: nodejs6.10
+      Description: "It creates a note"
+      Role: !GetAtt notesCreateRole.Arn
+      MemorySize: 128
+      Timeout: 15
+
+  # Notes Get By Id Function
+  notesGetIdRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "notesGetIdPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: "dynamodb:GetItem"
+                Resource: "*"
+  notesGetIdFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: js/getId.handler
+      Runtime: nodejs6.10
+      Description: "It gets a note"
+      Role: !GetAtt notesGetIdRole.Arn
+      MemorySize: 128
+      Timeout: 15
+      
+  # Notes Get All By UserId Function
+  notesGetRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "notesGetPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: "dynamodb:Query"
+                Resource: "*"
+  notesGetFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: js/get.handler
+      Runtime: nodejs6.10
+      Description: "It gets all notes by user id"
+      Role: !GetAtt notesGetRole.Arn
+      MemorySize: 128
+      Timeout: 15
+
+  # Notes Update By Id Function
+  notesPutIdRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "notesPutIdPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: "dynamodb:UpdateItem"
+                Resource: "*"
+  notesPutIdFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: js/update.handler
+      Runtime: nodejs6.10
+      Description: "It updates a note"
+      Role: !GetAtt notesPutIdRole.Arn
+      MemorySize: 128
+      Timeout: 15
+
+  # Notes Delete By Id Function
+  notesDeleteIdRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "notesDeleteIdPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: "dynamodb:DeleteItem"
+                Resource: "*"
+  notesDeleteIdFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: js/delete.handler
+      Runtime: nodejs6.10
+      Description: "It deletes a note"
+      Role: !GetAtt notesDeleteIdRole.Arn
+      MemorySize: 128
+      Timeout: 15
+
+  ##############################################################################
+  # Notes Rest API
+  ##############################################################################
+  notesRestApi:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "notes"
+      Description: "Notes API"
+  notesIdResource:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      ParentId: !GetAtt notesRestApi.RootResourceId
+      PathPart: "{id}"
+      RestApiId: !Ref notesRestApi
+  notesPostMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "POST"
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt notesCreateFunction.Arn
+      ResourceId: !GetAtt notesRestApi.RootResourceId
+      RestApiId: !Ref notesRestApi
+  notesCreateFunctionInvoke:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt notesCreateFunction.Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${notesRestApi}/*/POST/"
+  notesGetIdMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "GET"
+      RequestParameters:
+        method.request.path.id: true
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt notesGetIdFunction.Arn
+      ResourceId: !Ref notesIdResource
+      RestApiId: !Ref notesRestApi
+  notesGetIdFunctionInvoke:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt notesGetIdFunction.Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${notesRestApi}/*/GET/*"
+  notesGetMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "GET"
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt notesGetFunction.Arn
+      ResourceId: !GetAtt notesRestApi.RootResourceId
+      RestApiId: !Ref notesRestApi
+  notesGetFunctionInvoke:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt notesGetFunction.Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${notesRestApi}/*/GET/"
+  notesPutIdMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "PUT"
+      RequestParameters:
+        method.request.path.id: true
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt notesPutIdFunction.Arn
+      ResourceId: !Ref notesIdResource
+      RestApiId: !Ref notesRestApi
+  notesPutIdFunctionInvoke:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt notesPutIdFunction.Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${notesRestApi}/*/PUT/*"
+  notesDeleteIdMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "DELETE"
+      RequestParameters:
+        method.request.path.id: true
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt notesDeleteIdFunction.Arn
+      ResourceId: !Ref notesIdResource
+      RestApiId: !Ref notesRestApi
+  notesDeleteIdFunctionInvoke:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt notesDeleteIdFunction.Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${notesRestApi}/*/DELETE/*"
+  notesApiDeployment:
+    DependsOn:
+      - notesPostMethod
+      - notesGetIdMethod
+      - notesGetMethod
+      - notesPutIdMethod
+      - notesDeleteIdMethod
+    Type: "AWS::ApiGateway::Deployment"
+    Properties:
+      Description: "Notes API"
+      RestApiId: !Ref notesRestApi
+      StageName: "Prod"
+
+  ##############################################################################
+  # Notes User Pool & Identity Pool
+  ##############################################################################
+  notesUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: "notesUserPool"
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+  notesUserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: "notesApp"
+      UserPoolId: !Ref notesUserPool
+  notesIdentityPool:
+    DependsOn: notesRestApi
+    Type: "AWS::Cognito::IdentityPool"
+    Properties:
+      IdentityPoolName: "notesIdentityPool"
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - 
+          ClientId: !Ref notesUserPoolClient
+          ProviderName: !GetAtt notesUserPool.ProviderName
+  notesIdentityPoolAuthRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: 
+              Federated: "cognito-identity.amazonaws.com"
+            Action: 
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals: 
+                "cognito-identity.amazonaws.com:aud": !Ref notesIdentityPool
+              "ForAnyValue:StringLike":
+                "cognito-identity.amazonaws.com:amr": authenticated
+      Policies:
+        - PolicyName: "notesIdentityPoolAuthPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action:
+                  - "mobileanalytics:PutEvents"
+                  - "cognito-sync:*"
+                  - "cognito-identity:*"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "execute-api:Invoke"
+                Resource: !Sub "arn:aws:execute-api:${AWS::Region}:*:${notesRestApi}/*/*/*"
+  notesIdentityPoolUnauthRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: 
+              Federated: "cognito-identity.amazonaws.com"
+            Action: 
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals: 
+                "cognito-identity.amazonaws.com:aud": !Ref notesIdentityPool
+              "ForAnyValue:StringLike":
+                "cognito-identity.amazonaws.com:amr": unauthenticated
+      Policies:
+        - PolicyName: "notesIdentityPoolUnauthPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action:
+                  - "mobileanalytics:PutEvents"
+                  - "cognito-sync:*"
+                  - "cognito-identity:*"
+                Resource: "*"
+  notesIdentityPoolRoleMapping:
+    Type: "AWS::Cognito::IdentityPoolRoleAttachment"
+    Properties:
+      IdentityPoolId: !Ref notesIdentityPool
+      Roles:
+        authenticated: !GetAtt notesIdentityPoolAuthRole.Arn
+        unauthenticated: !GetAtt notesIdentityPoolUnauthRole.Arn
+  
+
+# Outputs
+Outputs:
+  notesUserPoolId:
+    Value: !Ref notesUserPool
+  notesIdentityPoolId:
+    Value: !Ref notesIdentityPool
+  notesUserPoolClientId:
+    Value: !Ref notesUserPoolClient
+  notesRestApiId:
+    Value: !Ref notesRestApi
