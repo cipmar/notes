@@ -31,8 +31,11 @@ Resources:
   notesCreateFunction:
     Type: "AWS::Serverless::Function"
     Properties:
-      Handler: js/create.handler
+      Handler: create.handler
       Runtime: nodejs6.10
+      CodeUri: 
+        Bucket: "notes-code2"
+        Key: "notes-backend.zip"
       Description: "It creates a note"
       Role: !GetAtt notesCreateRole.Arn
       MemorySize: 128
@@ -63,7 +66,10 @@ Resources:
   notesGetIdFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: js/getId.handler
+      CodeUri:
+        Bucket: "notes-code2"
+        Key: "notes-backend.zip"
+      Handler: getId.handler
       Runtime: nodejs6.10
       Description: "It gets a note"
       Role: !GetAtt notesGetIdRole.Arn
@@ -95,7 +101,10 @@ Resources:
   notesGetFunction:
     Type: "AWS::Serverless::Function"
     Properties:
-      Handler: js/get.handler
+      CodeUri:
+        Bucket: "notes-code2"
+        Key: "notes-backend.zip"
+      Handler: get.handler
       Runtime: nodejs6.10
       Description: "It gets all notes by user id"
       Role: !GetAtt notesGetRole.Arn
@@ -127,7 +136,10 @@ Resources:
   notesPutIdFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: js/update.handler
+      CodeUri:
+        Bucket: "notes-code2"
+        Key: "notes-backend.zip"
+      Handler: update.handler
       Runtime: nodejs6.10
       Description: "It updates a note"
       Role: !GetAtt notesPutIdRole.Arn
@@ -159,7 +171,10 @@ Resources:
   notesDeleteIdFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: js/delete.handler
+      CodeUri:
+        Bucket: "notes-code2"
+        Key: "notes-backend.zip"
+      Handler: delete.handler
       Runtime: nodejs6.10
       Description: "It deletes a note"
       Role: !GetAtt notesDeleteIdRole.Arn
