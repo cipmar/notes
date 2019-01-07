@@ -202,12 +202,20 @@ Resources:
       HttpMethod: "POST"
       Integration:
         IntegrationHttpMethod: "POST"
+        IntegrationResponses:
+          -
+            StatusCode: 200
         Type: "AWS_PROXY"
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
           - lambdaArn: !GetAtt notesCreateFunction.Arn
       ResourceId: !GetAtt notesRestApi.RootResourceId
       RestApiId: !Ref notesRestApi
+      MethodResponses:
+        -
+          StatusCode: 200
+          ResponseModels:
+            application/json: Empty
   notesCreateFunctionInvoke:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -224,12 +232,20 @@ Resources:
         method.request.path.id: true
       Integration:
         IntegrationHttpMethod: "POST"
+        IntegrationResponses:
+          -
+            StatusCode: 200
         Type: "AWS_PROXY"
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
           - lambdaArn: !GetAtt notesGetIdFunction.Arn
       ResourceId: !Ref notesIdResource
       RestApiId: !Ref notesRestApi
+      MethodResponses:
+        -
+          StatusCode: 200
+          ResponseModels:
+            application/json: Empty
   notesGetIdFunctionInvoke:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -244,12 +260,20 @@ Resources:
       HttpMethod: "GET"
       Integration:
         IntegrationHttpMethod: "POST"
+        IntegrationResponses:
+          -
+            StatusCode: 200
         Type: "AWS_PROXY"
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
           - lambdaArn: !GetAtt notesGetFunction.Arn
       ResourceId: !GetAtt notesRestApi.RootResourceId
       RestApiId: !Ref notesRestApi
+      MethodResponses:
+        -
+          StatusCode: 200
+          ResponseModels:
+            application/json: Empty
   notesGetFunctionInvoke:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -266,12 +290,20 @@ Resources:
         method.request.path.id: true
       Integration:
         IntegrationHttpMethod: "POST"
+        IntegrationResponses:
+          -
+            StatusCode: 200
         Type: "AWS_PROXY"
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
           - lambdaArn: !GetAtt notesPutIdFunction.Arn
       ResourceId: !Ref notesIdResource
       RestApiId: !Ref notesRestApi
+      MethodResponses:
+        -
+          StatusCode: 200
+          ResponseModels:
+            application/json: Empty
   notesPutIdFunctionInvoke:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -288,12 +320,20 @@ Resources:
         method.request.path.id: true
       Integration:
         IntegrationHttpMethod: "POST"
+        IntegrationResponses:
+          -
+            StatusCode: 200
         Type: "AWS_PROXY"
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
           - lambdaArn: !GetAtt notesDeleteIdFunction.Arn
       ResourceId: !Ref notesIdResource
       RestApiId: !Ref notesRestApi
+      MethodResponses:
+        -
+          StatusCode: 200
+          ResponseModels:
+            application/json: Empty
   notesDeleteIdFunctionInvoke:
     Type: "AWS::Lambda::Permission"
     Properties:
