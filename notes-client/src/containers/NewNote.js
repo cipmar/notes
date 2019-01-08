@@ -9,8 +9,6 @@ export default class NewNote extends Component {
     constructor(props) {
         super(props);
 
-        this.file = null;
-
         this.state = {
             isLoading: null,
             content: ""
@@ -27,17 +25,8 @@ export default class NewNote extends Component {
         })
     };
     
-    handleFileChange = event => {
-        this.file = event.target.files[0];
-    };
-    
     handleSubmit = async event => {
         event.preventDefault();
-
-        if (this.file && this.file.size > config.MAX_ATTACHMENT_SIZE) {
-            alert(`Please pick a smaller file than ${config.MAX_ATTACHMENT_SIZE} MB.`);
-            return;
-        }
 
         this.setState({isLoading: true});
 
@@ -68,13 +57,6 @@ export default class NewNote extends Component {
                             onChange={this.handleChange}
                             value={this.state.content}
                             componentClass="textarea"
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="file">
-                        <ControlLabel>Attachment</ControlLabel>
-                        <FormControl
-                            onChange={this.handleFileChange}
-                            type="file"
                         />
                     </FormGroup>
                     <LoaderButton
