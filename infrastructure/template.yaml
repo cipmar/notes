@@ -28,6 +28,12 @@ Resources:
               - Effect: "Allow"
                 Action: "dynamodb:PutItem"
                 Resource: "*"
+              - Effect: "Allow"
+                Action: 
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
   notesCreateFunction:
     Type: "AWS::Serverless::Function"
     Properties:
@@ -63,6 +69,12 @@ Resources:
               - Effect: "Allow"
                 Action: "dynamodb:GetItem"
                 Resource: "*"
+              - Effect: "Allow"
+                Action: 
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
   notesGetIdFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -98,6 +110,12 @@ Resources:
               - Effect: "Allow"
                 Action: "dynamodb:Query"
                 Resource: "*"
+              - Effect: "Allow"
+                Action: 
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
   notesGetFunction:
     Type: "AWS::Serverless::Function"
     Properties:
@@ -133,6 +151,12 @@ Resources:
               - Effect: "Allow"
                 Action: "dynamodb:UpdateItem"
                 Resource: "*"
+              - Effect: "Allow"
+                Action: 
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
   notesPutIdFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -168,6 +192,12 @@ Resources:
               - Effect: "Allow"
                 Action: "dynamodb:DeleteItem"
                 Resource: "*"
+              - Effect: "Allow"
+                Action: 
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
   notesDeleteIdFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
