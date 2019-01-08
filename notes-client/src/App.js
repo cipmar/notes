@@ -19,7 +19,6 @@ class App extends Component {
   async componentDidMount() {
     try {
       const session = await Auth.currentSession();
-      console.log(session);
       this.userHasAuthenticated(true);
     }
     catch(e) {

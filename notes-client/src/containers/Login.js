@@ -29,6 +29,7 @@ export default class Login extends Component {
             this.props.userHasAuthenticated(true);
         } catch (e) {
             alert(e.message);
+            this.setState({isLoading: false});
         }
     };
     
