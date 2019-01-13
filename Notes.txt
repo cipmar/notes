@@ -1,1 +1,1 @@
-https://serverless-stack.com/chapters/add-the-create-note-page.html
+https://serverless-stack.com/chapters/what-is-infrastructure-as-code.html
