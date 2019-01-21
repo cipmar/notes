@@ -1,6 +1,6 @@
 var AWS = require("aws-sdk");
 var uuid = require("uuid");
-var resp = require("./response-lib.js");
+var resp = require("response-lib");
 
 exports.handler = (event, context, callback) => {
     var data = JSON.parse(event.body);

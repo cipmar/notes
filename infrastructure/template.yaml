@@ -5,6 +5,18 @@ Resources:
   ##############################################################################
   # Functions
   ##############################################################################
+
+  # Notes Lib Layer
+  notesLibLayer:
+    Type: "AWS::Lambda::LayerVersion"
+    Properties:
+      CompatibleRuntimes:
+        - nodejs6.10
+      Content:
+        S3Bucket: "notes-code2"
+        S3Key: "notes-lib.zip"
+      Description: "Notes Lib"
+      LayerName: "notes-lib"
   
   # Notes Create Function
   notesCreateRole:
@@ -41,7 +53,9 @@ Resources:
       Runtime: nodejs6.10
       CodeUri: 
         Bucket: "notes-code2"
-        Key: "notes-backend.zip"
+        Key: "notes-create.zip"
+      Layers:
+        - !Ref notesLibLayer
       Description: "It creates a note"
       Role: !GetAtt notesCreateRole.Arn
       MemorySize: 128
@@ -80,7 +94,9 @@ Resources:
     Properties:
       CodeUri:
         Bucket: "notes-code2"
-        Key: "notes-backend.zip"
+        Key: "notes-getId.zip"
+      Layers:
+        - !Ref notesLibLayer
       Handler: getId.handler
       Runtime: nodejs6.10
       Description: "It gets a note"
@@ -121,7 +137,9 @@ Resources:
     Properties:
       CodeUri:
         Bucket: "notes-code2"
-        Key: "notes-backend.zip"
+        Key: "notes-get.zip"
+      Layers:
+        - !Ref notesLibLayer
       Handler: get.handler
       Runtime: nodejs6.10
       Description: "It gets all notes by user id"
@@ -162,7 +180,9 @@ Resources:
     Properties:
       CodeUri:
         Bucket: "notes-code2"
-        Key: "notes-backend.zip"
+        Key: "notes-update.zip"
+      Layers:
+        - !Ref notesLibLayer
       Handler: update.handler
       Runtime: nodejs6.10
       Description: "It updates a note"
@@ -203,7 +223,9 @@ Resources:
     Properties:
       CodeUri:
         Bucket: "notes-code2"
-        Key: "notes-backend.zip"
+        Key: "notes-delete.zip"
+      Layers:
+        - !Ref notesLibLayer
       Handler: delete.handler
       Runtime: nodejs6.10
       Description: "It deletes a note"
